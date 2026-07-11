@@ -1,0 +1,10 @@
+flowchart LR
+    HTTP[HTTP / WebSocket adapters] --> APP[Application use cases]
+    ACTOR[Room actor] --> APP
+    APP --> ENGINE[Deterministic engine]
+    ENGINE --> DOMAIN[Domain state + rules]
+    APP --> PORTS[Persistence / clock / random ports]
+    PG[PostgreSQL adapter] --> PORTS
+    REDIS[Redis adapter] --> PORTS
+    CRYPTO[Crypto random adapter] --> PORTS
+    ENGINE -. no infrastructure imports .- DOMAIN

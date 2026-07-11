@@ -1,0 +1,10 @@
+flowchart LR
+    APP[React app + routes] --> PAGES[Pages]
+    PAGES --> FEATURES[Features]
+    FEATURES --> ENTITIES[Entities]
+    FEATURES --> NETWORK[HTTP / WebSocket + Zod]
+    FEATURES --> BRIDGE[Game bridge]
+    BRIDGE --> PIXI[PixiJS scenes]
+    NETWORK --> STORE[Authoritative projection store]
+    STORE --> BRIDGE
+    VOICE[Voice placeholder] -. future WebRTC .-> APP

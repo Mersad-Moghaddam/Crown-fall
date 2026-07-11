@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS asset_manifests;
+DROP TABLE IF EXISTS reports;
+DROP TABLE IF EXISTS role_stats;
+DROP TABLE IF EXISTS match_snapshots;
+DROP TABLE IF EXISTS match_events;
+DROP TABLE IF EXISTS match_players;
+DROP TABLE IF EXISTS matches;
+DROP TABLE IF EXISTS rooms;
+DROP TABLE IF EXISTS profiles;
+DROP TABLE IF EXISTS users;

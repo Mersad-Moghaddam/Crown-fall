@@ -1,0 +1,24 @@
+stateDiagram-v2
+    [*] --> LOBBY
+    LOBBY --> ROLE_DEAL
+    ROLE_DEAL --> CHAPTER_START
+    CHAPTER_START --> CRISIS_REVEAL
+    CRISIS_REVEAL --> NOMINATION
+    NOMINATION --> COUNCIL_VOTE
+    COUNCIL_VOTE --> PARTY_BUILD: government approved
+    COUNCIL_VOTE --> ROUND_END: government rejected / decree resolved
+    PARTY_BUILD --> QUEST_COMMIT
+    QUEST_COMMIT --> QUEST_REVEAL
+    QUEST_REVEAL --> EXECUTIVE_POWER
+    EXECUTIVE_POWER --> TRIAL_WINDOW
+    TRIAL_WINDOW --> ROUND_END
+    ROUND_END --> CHAPTER_START: no terminal condition and chapter < 5
+    ROUND_END --> FINAL_RECKONING: Hope 3, Dread 3, Ruin 4, Usurper, or chapter 5
+    FINAL_RECKONING --> EPILOGUE
+    EPILOGUE --> LOBBY: rematch / change script
+    EPILOGUE --> [*]: leave room
+
+    note right of EPILOGUE
+      Canonical identifier from the normative GDD table.
+      Figure 3's EPILOGUE_REMATCH label is a documented inconsistency.
+    end note

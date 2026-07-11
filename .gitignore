@@ -1,0 +1,11 @@
+.env
+*.local
+.DS_Store
+frontend/node_modules/
+frontend/dist/
+frontend/playwrightReport/
+frontend/testResults/
+frontend/*.tsbuildinfo
+backend/bin/
+coverage/
+*.out

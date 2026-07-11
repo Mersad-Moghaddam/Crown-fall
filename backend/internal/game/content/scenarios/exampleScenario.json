@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "id": "fixture.emptyThrone",
+  "localizationKey": "scenario.emptyThrone",
+  "roleIds": ["fixture.oathboundKnight"],
+  "status": "testFixture"
+}

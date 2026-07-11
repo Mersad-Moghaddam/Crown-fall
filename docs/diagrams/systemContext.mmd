@@ -1,0 +1,17 @@
+flowchart LR
+    CLIENT[Browser Client<br/>React + PixiJS]
+    EDGE[Edge / Gateway<br/>TLS, auth, limits]
+    MATCH[Go Match Server<br/>Room actors + engine]
+    VOICE[Voice Plane Placeholder<br/>WebRTC / SFU]
+    REDIS[Redis<br/>Ephemeral coordination]
+    DB[(PostgreSQL<br/>Events + snapshots)]
+    OBS[Observability<br/>OTel]
+    ASSETS[Asset CDN]
+    CLIENT <--> EDGE
+    EDGE <--> MATCH
+    CLIENT <-. future media/signaling .-> VOICE
+    MATCH <--> REDIS
+    MATCH --> DB
+    MATCH --> OBS
+    VOICE --> OBS
+    CLIENT --> ASSETS

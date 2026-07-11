@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "id": "fixture.oathboundKnight",
+  "localizationKey": "role.oathboundKnight",
+  "faction": "CROWN",
+  "status": "testFixture"
+}

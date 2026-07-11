@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "id": "fixture.firstCrisis",
+  "localizationKey": "event.firstCrisis",
+  "status": "testFixture"
+}
