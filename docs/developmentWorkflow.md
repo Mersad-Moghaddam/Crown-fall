@@ -1,6 +1,6 @@
 # Development Workflow
 
-1. Read the GDD and relevant architecture document.
+1. Read the GDD, `AGENTS.md`, and the relevant architecture document.
 2. Create a small feature-local change; update versioned contracts before or with wire changes.
 3. Add unit tests for domain behavior and contract/integration tests at boundaries.
 4. Run `make lint`, `make test`, and `make build`.

@@ -20,11 +20,11 @@ Feature directories cover authentication, lobby management, matchmaking, room ma
 - Feature-local Zustand or component state owns UI selections only.
 - Game-local controllers own animation queues and audio state; frame-frequency data never enters React.
 
-On a server event, the network layer validates the envelope with Zod, checks sequence continuity, applies acknowledged public/private projections once, and queues semantic animation instructions. PixiJS interpolates from the old visual state to the new projection without delaying authoritative state. Client intentions show non-secret pending feedback only; accepted/rejected events decide the outcome.
+Implemented frontend protocol code validates command and server envelopes with Zod. Live WebSocket/store hydration and sequence-gap recovery are planned. The implemented Pixi bridge accepts a read-only phase/revision projection and exposes an intention callback; it does not mutate authoritative state.
 
 ## Connection and recovery
 
-Authenticate the WebSocket during upgrade or its first bounded message. Heartbeats detect stale connections. Reconnect uses exponential backoff with jitter and a short-lived token, sending last acknowledged sequence. The server returns an event tail or compressed recipient-safe snapshot plus tail. Hydration replaces the authoritative store atomically, cancels obsolete animations, and resumes from the server phase/deadline. A dedicated reconnect route explains prolonged failure.
+The backend currently authenticates with a local test-token boundary and provides in-memory public/private resync on connection replacement. Frontend authentication, heartbeat, retry/backoff, reconnect UI, event-tail replay, and atomic store hydration are planned.
 
 ## Presentation systems
 

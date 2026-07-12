@@ -58,9 +58,20 @@ CREATE TABLE match_events (
 
 CREATE INDEX match_events_time_idx ON match_events (match_id, server_time);
 
+CREATE FUNCTION reject_match_event_mutation() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION 'match_events is append-only';
+END;
+$$;
+
+CREATE TRIGGER match_events_immutable
+BEFORE UPDATE OR DELETE ON match_events
+FOR EACH ROW EXECUTE FUNCTION reject_match_event_mutation();
+
 CREATE TABLE match_snapshots (
     match_id uuid NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
     event_sequence bigint NOT NULL,
+	match_revision bigint NOT NULL CHECK (match_revision >= 0),
     phase text NOT NULL,
     compressed_state bytea NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now(),

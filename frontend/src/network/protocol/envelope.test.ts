@@ -1,33 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { serverEventEnvelopeSchema } from './envelope';
+import { clientEnvelopeSchema, serverEventEnvelopeSchema } from './envelope';
 
-describe('server event envelope', () => {
-  it('accepts a public authoritative event', () => {
-    const event = serverEventEnvelopeSchema.parse({
-      protocol_version: '1.0.0',
-      match_id: 'match-1',
-      seq: 1,
-      type: 'match.stateUpdated',
-      phase: 'LOBBY',
-      public: {},
-      server_time: '2026-07-11T10:00:00Z',
-      accepted_revision: 0,
+describe('realtime protocol envelopes', () => {
+  it('accepts the implemented command contract', () => {
+    const message = clientEnvelopeSchema.parse({
+      version: '1.0.0',
+      messageId: 'message-1',
+      command: {
+        commandId: 'command-1',
+        matchId: 'match-1',
+        playerId: 'player-1',
+        expectedRevision: 0,
+        commandType: 'JOIN_ROOM',
+        payload: {},
+        clientTimestamp: '2026-07-11T10:00:00Z',
+        clientSequence: 1,
+      },
     });
-    expect(event.phase).toBe('LOBBY');
+    expect(message.command.commandType).toBe('JOIN_ROOM');
   });
 
-  it('rejects non-normative phases', () => {
-    expect(() =>
-      serverEventEnvelopeSchema.parse({
-        protocol_version: '1.0.0',
-        match_id: 'match-1',
-        seq: 1,
-        type: 'match.stateUpdated',
-        phase: 'EPILOGUE_REMATCH',
-        public: {},
-        server_time: '2026-07-11T10:00:00Z',
-        accepted_revision: 0,
-      }),
-    ).toThrow();
+  it('accepts a server projection and rejects unknown versions', () => {
+    const data = {
+      version: '1.0.0',
+      messageId: 'message-1',
+      matchId: 'match-1',
+      sequence: 1,
+      serverTime: '2026-07-11T10:00:00Z',
+      type: 'match.publicState',
+      payload: {},
+    };
+    expect(serverEventEnvelopeSchema.parse(data).type).toBe('match.publicState');
+    expect(() => serverEventEnvelopeSchema.parse({ ...data, version: '2.0.0' })).toThrow();
   });
 });

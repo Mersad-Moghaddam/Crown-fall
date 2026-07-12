@@ -7,14 +7,31 @@ import (
 
 	matchdomain "crownfall/backend/internal/game/domain/match"
 	"crownfall/backend/internal/game/engine"
+	platformrandom "crownfall/backend/internal/platform/random"
 )
 
 func main() {
-	state := matchdomain.New("simulation", "fixed-commitment")
-	state.Players["player-1"] = matchdomain.Player{ID: "player-1", Ready: true, RoleID: "fixture-role"}
-	result, err := (engine.Engine{}).Handle(context.Background(), state, engine.Command{CommandID: "simulation-1", MatchID: state.ID, PlayerID: "player-1", CommandType: engine.CommandStartMatch, ClientTimestamp: time.Unix(0, 0).UTC(), ClientSequence: 1})
-	if err != nil {
-		panic(err)
+	seed := []byte("crownfall-deterministic-simulation")
+	state := matchdomain.New("simulation", seed, platformrandom.Commitment(seed))
+	processor := engine.Engine{}
+	sequence := map[string]uint64{}
+	handle := func(id, playerID, commandType string, payload map[string]any) {
+		sequence[playerID]++
+		result, err := processor.Handle(context.Background(), state, engine.Command{CommandID: id, MatchID: state.ID, PlayerID: playerID, ExpectedRevision: state.Revision, CommandType: commandType, Payload: payload, ClientTimestamp: time.Unix(1, 0).UTC(), ClientSequence: sequence[playerID]})
+		if err != nil {
+			panic(err)
+		}
+		state = result.State
 	}
-	fmt.Printf("phase=%s revision=%d events=%d\n", result.State.Phase, result.State.Revision, len(result.DomainEvents))
+	for index := 1; index <= 6; index++ {
+		id := fmt.Sprintf("player-%d", index)
+		handle("join-"+id, id, engine.CommandJoinRoom, nil)
+		handle("ready-"+id, id, engine.CommandSetReady, map[string]any{"ready": true})
+	}
+	handle("start", "player-1", engine.CommandStartMatch, nil)
+	for index := 1; index <= 6; index++ {
+		id := fmt.Sprintf("player-%d", index)
+		handle("ack-"+id, id, engine.CommandAcknowledgeRole, nil)
+	}
+	fmt.Printf("phase=%s revision=%d events=%d commitment=%s\n", state.Phase, state.Revision, state.EventSequence, state.SeedCommitment)
 }

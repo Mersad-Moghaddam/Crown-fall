@@ -21,7 +21,7 @@ go vet ./...
 go build ./cmd/server
 ```
 
-The migration command is currently an explicit adapter boundary; SQL files are applied by the deployment migration tool. WebSocket contracts live in `api/asyncapi.yaml`.
+The migration command connects through `CROWNFALL_DATABASE_URL`, records schema version 1, and applies the reversible SQL files from `CROWNFALL_MIGRATIONS_PATH`. WebSocket contracts live in `api/asyncapi.yaml`. The implemented in-memory bootstrap supports room creation, six to ten joins, readiness, host start, deterministic role delivery, acknowledgement, and reconnect resync. Durable event/snapshot recovery remains deferred.
 
 ## Extending the system
 

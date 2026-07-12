@@ -14,7 +14,7 @@ export default function MatchPage() {
           <span aria-hidden="true" /> Mock connection: synchronized
         </div>
       </header>
-      <PixiBoard phase="LOBBY" />
+      <PixiBoard projection={{ phase: 'LOBBY', revision: 0 }} onIntention={() => undefined} />
       <aside className="panel">
         <h2>Authoritative phase</h2>
         <strong>LOBBY</strong>

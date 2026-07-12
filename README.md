@@ -17,7 +17,7 @@ Frontend and backend do not import each other's source. Their only shared bounda
 
 ## Prerequisites
 
-- Node.js 24 LTS and npm
+- Node.js 24.18.0 LTS and npm 11
 - Go 1.26 with toolchain 1.26.5
 - Docker with Compose (for PostgreSQL and Redis)
 - GNU Make
@@ -55,8 +55,8 @@ See [development workflow](docs/developmentWorkflow.md), [frontend architecture]
 
 ## Contribution and security
 
-Read `agents.md` and the relevant architecture document before editing. Game-rule changes require tests and GDD review; contract changes require schema updates. Never report suspected secret-state exposure in a public issue—use the private project security channel.
+Read `AGENTS.md` and the relevant architecture document before editing. Game-rule changes require tests and GDD review; contract changes require schema updates. Never report suspected secret-state exposure in a public issue—use the private project security channel.
 
 ## License and roadmap
 
-This is proprietary software; see `license`. The next milestones are durable room recovery, authentication, full scenario content, playtest simulation, and a separately reviewed voice-plane integration.
+This is proprietary software; see `LICENSE`. The next milestones are durable room recovery, authentication, full scenario content, playtest simulation, and a separately reviewed voice-plane integration.

@@ -6,7 +6,7 @@ The frontend owns navigation, accessible UI, lobby/room flows, connection lifecy
 
 Node 24, TypeScript, React, Vite, PixiJS, Zustand, TanStack Query, React Router, Zod, Vitest, Testing Library, Playwright, ESLint, and Prettier. Code is feature-oriented under `src/app`, `pages`, `features`, `entities`, `game`, `network`, and `shared`. `features/voice` is an unimplemented boundary.
 
-State is separated into authoritative remote snapshots, private player projection, connection, local UI, animation, and audio state. Authoritative state is stored once; PixiJS receives render projections through `game/bridge`.
+The current slice validates protocol and environment data but does not yet maintain a live frontend match store. The documented design separates authoritative remote snapshots, private player projection, connection, local UI, animation, and audio state. PixiJS receives read-only render projections through `game/bridge` and emits intentions only.
 
 ## Environment and commands
 

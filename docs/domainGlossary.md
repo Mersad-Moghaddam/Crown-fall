@@ -11,7 +11,7 @@
 | Domain Event | Canonical fact produced by accepted engine execution. |
 | Public / Private Event | Recipient-safe presentation of a canonical fact. |
 | Projection | Explicit client view derived from internal state. |
-| Snapshot | Compressed internal recovery state stored every 20 events and phase boundary. |
+| Snapshot | Planned compressed recovery state; the required future cadence is every 20 events and phase boundary. |
 | Revision / Sequence | Monotonic state version / strictly ordered event position. |
 | Quest | Party action resolved from owner-hidden Sigils. |
 | Trial | Post-Quest accusation and banishment vote. |
@@ -24,4 +24,4 @@
 
 ## GDD consistency note
 
-GDD Figure 3 labels the post-`FINAL_RECKONING` state `EPILOGUE_REMATCH`, while the immediately following normative allowed-command table defines `EPILOGUE`. The revised architecture brief also declares `EPILOGUE` canonical. Therefore the engine, contracts, tests, and diagrams use `EPILOGUE`; rematch, script change, and departure are outgoing behavior, not a second state. The source discrepancy remains documented rather than silently rewritten.
+GDD Figure 3 labels the post-`FINAL_RECKONING` state `EPILOGUE_REMATCH`, while the immediately following normative allowed-command table defines `EPILOGUE`. The revised architecture brief also declares `EPILOGUE` canonical. Therefore the engine, contracts, tests, persistence, and telemetry use only `EPILOGUE`. `ROOM_LOBBY`, `SCRIPT_SELECTION`, and `ROOM_DEPARTURE` describe outgoing product destinations, not replacement match-engine phases. The source discrepancy remains documented rather than silently rewritten.

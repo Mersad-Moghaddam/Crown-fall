@@ -1,19 +1,18 @@
-asyncapi: 3.0.0
+asyncapi: 3.1.0
 info:
   title: Crownfall Realtime Protocol
-  version: 0.1.0
-  description: Versioned WebSocket control protocol. Private partitions are filtered per authenticated recipient before delivery.
+  version: 1.0.0
+  description: Implemented bootstrap control protocol. Authentication is a test-token boundary pending production identity integration.
 servers:
   local:
     host: localhost:8080
     protocol: ws
 channels:
   match:
-    address: /ws
+    address: /ws{?matchId,playerId}
     messages:
       clientCommand: { $ref: "#/components/messages/ClientCommand" }
       serverEvent: { $ref: "#/components/messages/ServerEvent" }
-      error: { $ref: "#/components/messages/Error" }
 operations:
   receiveCommand:
     action: receive
@@ -22,73 +21,65 @@ operations:
   sendEvent:
     action: send
     channel: { $ref: "#/channels/match" }
-    messages:
-      - { $ref: "#/channels/match/messages/serverEvent" }
-      - { $ref: "#/channels/match/messages/error" }
+    messages: [{ $ref: "#/channels/match/messages/serverEvent" }]
 components:
   messages:
     ClientCommand:
-      payload: { $ref: "#/components/schemas/ClientCommandEnvelope" }
+      payload: { $ref: "#/components/schemas/ClientEnvelope" }
     ServerEvent:
-      payload: { $ref: "#/components/schemas/ServerEventEnvelope" }
-    Error:
-      payload: { $ref: "#/components/schemas/ErrorEnvelope" }
+      payload: { $ref: "#/components/schemas/ServerEnvelope" }
   schemas:
-    ClientCommandEnvelope:
+    ClientEnvelope:
       type: object
-      required: [protocol_version, command_id, match_id, player_id, expected_revision, command_type, payload, client_timestamp, client_sequence]
+      additionalProperties: false
+      required: [version, messageId, command]
       properties:
-        protocol_version: { const: "1.0.0" }
-        command_id: { type: string }
-        match_id: { type: string }
-        player_id: { type: string }
-        expected_revision: { type: integer, minimum: 0 }
-        command_type:
-          type: string
-          description: Categories include authentication, lobby, room membership, vote, quest, trial, reconnect, chat, and presence. Initial implemented example is START_MATCH.
+        version: { const: "1.0.0" }
+        messageId: { type: string, minLength: 1 }
+        command: { $ref: "#/components/schemas/Command" }
+    Command:
+      type: object
+      additionalProperties: false
+      required: [commandId, matchId, playerId, expectedRevision, commandType, payload, clientTimestamp, clientSequence]
+      properties:
+        commandId: { type: string, minLength: 1 }
+        matchId: { type: string, minLength: 1 }
+        playerId: { type: string, minLength: 1 }
+        expectedRevision: { type: integer, minimum: 0 }
+        commandType: { type: string, enum: [JOIN_ROOM, SET_READY, START_MATCH, ACKNOWLEDGE_ROLE] }
         payload: { type: object }
-        client_timestamp: { type: string, format: date-time }
-        client_sequence: { type: integer, minimum: 1 }
-    ServerEventEnvelope:
+        clientTimestamp: { type: string, format: date-time }
+        clientSequence: { type: integer, minimum: 1 }
+    ServerEnvelope:
       type: object
-      required: [protocol_version, match_id, seq, type, phase, public, server_time, accepted_revision]
+      additionalProperties: false
+      required: [version, messageId, serverTime, type, payload]
       properties:
-        protocol_version: { const: "1.0.0" }
-        match_id: { type: string }
-        seq: { type: integer, minimum: 1 }
+        version: { const: "1.0.0" }
+        messageId: { type: string }
+        matchId: { type: string }
+        sequence: { type: integer, minimum: 0 }
+        serverTime: { type: string, format: date-time }
         type:
           type: string
-          description: Connection, match start/state, role-private, vote, quest, trial, scenario, ending, chat, presence, and reconnection categories.
-        phase: { $ref: "#/components/schemas/Phase" }
-        public: { type: object }
-        private:
-          type: object
-          additionalProperties: { type: object }
-          description: Server-internal recipient map; delivery projects only the authenticated recipient's entry.
-        server_time: { type: string, format: date-time }
-        accepted_revision: { type: integer, minimum: 0 }
-    ErrorEnvelope:
+          enum: [connection.accepted, connection.resynced, match.publicState, match.privateState, match.privateEvents, protocol.error]
+        payload:
+          description: Recipient-filtered public state, private player state, role event, acknowledgement, or protocol error.
+    PublicMatchView:
       type: object
-      required: [protocol_version, type, code, message, server_time]
-      properties:
-        protocol_version: { const: "1.0.0" }
-        type: { const: error }
-        code: { type: string }
-        message: { type: string }
-        command_id: { type: string }
-        server_time: { type: string, format: date-time }
-    Phase:
-      type: string
-      enum: [LOBBY, ROLE_DEAL, CHAPTER_START, CRISIS_REVEAL, NOMINATION, COUNCIL_VOTE, PARTY_BUILD, QUEST_COMMIT, QUEST_REVEAL, EXECUTIVE_POWER, TRIAL_WINDOW, ROUND_END, FINAL_RECKONING, EPILOGUE, PAUSED_RECONNECT]
-    RolePrivateMessage:
+      description: Implemented public room/match projection; contains no role, faction, objective, or seed.
+    PrivatePlayerView:
       type: object
-      description: Unimplemented private role projection placeholder.
-    MatchStateUpdate:
-      type: object
-      description: Unimplemented public/private snapshot placeholder.
+      description: Implemented authenticated-recipient projection including only that player's role and acknowledgement status.
     VoteCommand:
-      allOf: [{ $ref: "#/components/schemas/ClientCommandEnvelope" }]
-      description: Unimplemented CAST_VOTE placeholder.
-    ReconnectCommand:
-      allOf: [{ $ref: "#/components/schemas/ClientCommandEnvelope" }]
-      description: Unimplemented reconnect placeholder carrying last acknowledged sequence.
+      type: object
+      description: Planned and unimplemented vote placeholder.
+    Reconnect:
+      type: object
+      description: Implemented in-memory resync on authenticated WebSocket replacement; durable replay remains deferred.
+    Chat:
+      type: object
+      description: Planned and unimplemented chat placeholder.
+    Presence:
+      type: object
+      description: Connection lifecycle exists; durable presence leases are planned and unimplemented.

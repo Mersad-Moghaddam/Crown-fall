@@ -7,7 +7,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"crownfall/backend/internal/game/content"
 	"crownfall/backend/internal/platform/config"
 	"crownfall/backend/internal/platform/logging"
 	"crownfall/backend/internal/realtime/rooms"
@@ -16,8 +18,12 @@ import (
 func main() {
 	configuration := config.Load()
 	logger := logging.New(configuration.LogLevel)
+	if err := content.Validate(); err != nil {
+		logger.Error("invalid game content", "error", err)
+		os.Exit(1)
+	}
 	registry := rooms.NewRegistry()
-	server := &http.Server{Addr: configuration.HTTPAddress, Handler: newHandler(logger), ReadHeaderTimeout: configuration.ShutdownTimeout}
+	server := &http.Server{Addr: configuration.HTTPAddress, Handler: newHandler(logger, registry), ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 60 * time.Second}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

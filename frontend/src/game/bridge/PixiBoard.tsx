@@ -1,36 +1,58 @@
-import { Application, Graphics, Text } from 'pixi.js';
 import { useEffect, useRef } from 'react';
+import {
+  createPixiRuntime,
+  type BoardProjection,
+  type PixiRuntimeFactory,
+  type PlayerIntention,
+} from './pixiRuntime';
 
-export function PixiBoard({ phase }: { phase: string }) {
+export type PixiBoardProps = {
+  projection: BoardProjection;
+  onIntention: (intention: PlayerIntention) => void;
+  runtimeFactory?: PixiRuntimeFactory;
+};
+
+export function PixiBoard({
+  projection,
+  onIntention,
+  runtimeFactory = createPixiRuntime,
+}: PixiBoardProps) {
   const host = useRef<HTMLDivElement>(null);
+  const runtime = useRef<ReturnType<PixiRuntimeFactory> | null>(null);
+  const projectionRef = useRef(projection);
+  const intentionRef = useRef(onIntention);
 
   useEffect(() => {
-    const application = new Application();
-    let disposed = false;
-    void application
-      .init({ background: '#171025', resizeTo: host.current!, antialias: true })
-      .then(() => {
-        if (disposed) return;
-        host.current?.appendChild(application.canvas);
-        const table = new Graphics()
-          .circle(400, 220, 180)
-          .fill({ color: '#34264a' })
-          .stroke({ color: '#c7a667', width: 4 });
-        const label = new Text({
-          text: `Authoritative projection · ${phase}`,
-          style: { fill: '#f3ead8', fontFamily: 'Georgia', fontSize: 22 },
-        });
-        label.anchor.set(0.5);
-        label.position.set(400, 220);
-        application.stage.addChild(table, label);
-      });
+    projectionRef.current = projection;
+  }, [projection]);
+  useEffect(() => {
+    intentionRef.current = onIntention;
+  }, [onIntention]);
+
+  useEffect(() => {
+    const instance = runtimeFactory();
+    const hostElement = host.current!;
+    runtime.current = instance;
+    void instance.mount(hostElement, projectionRef.current, (intention) =>
+      intentionRef.current(intention),
+    );
     return () => {
-      disposed = true;
-      application.destroy(true, { children: true });
+      instance.destroy();
+      runtime.current = null;
+      hostElement.replaceChildren();
     };
-  }, [phase]);
+  }, [runtimeFactory]);
+
+  useEffect(() => {
+    runtime.current?.update(projection);
+  }, [projection]);
 
   return (
-    <div className="board" ref={host} aria-label={`Animated Crownfall table in ${phase} phase`} />
+    <div
+      className="board"
+      ref={host}
+      data-testid="pixi-board"
+      aria-label={`Animated Crownfall table in ${projection.phase} phase`}
+    />
   );
 }

@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS role_stats;
 DROP TABLE IF EXISTS match_snapshots;
 DROP TABLE IF EXISTS match_events;
+DROP FUNCTION IF EXISTS reject_match_event_mutation();
 DROP TABLE IF EXISTS match_players;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS rooms;

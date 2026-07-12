@@ -15,8 +15,12 @@ stateDiagram-v2
     ROUND_END --> CHAPTER_START: no terminal condition and chapter < 5
     ROUND_END --> FINAL_RECKONING: Hope 3, Dread 3, Ruin 4, Usurper, or chapter 5
     FINAL_RECKONING --> EPILOGUE
-    EPILOGUE --> LOBBY: rematch / change script
-    EPILOGUE --> [*]: leave room
+    EPILOGUE --> ROOM_LOBBY: rematch
+    EPILOGUE --> SCRIPT_SELECTION: change script
+    EPILOGUE --> ROOM_DEPARTURE: leave room
+    ROOM_LOBBY --> LOBBY: start rematch
+    SCRIPT_SELECTION --> LOBBY: script selected
+    ROOM_DEPARTURE --> [*]
 
     note right of EPILOGUE
       Canonical identifier from the normative GDD table.

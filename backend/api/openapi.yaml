@@ -3,36 +3,53 @@ info:
   title: Crownfall HTTP API
   version: 0.1.0
   description: Initial authoritative-server control API. Placeholder operations return 501 until implemented.
+  license:
+    name: Proprietary
+security: []
 servers:
   - url: http://localhost:8080
 paths:
   /healthz:
     get:
+      summary: Check process health
       operationId: getHealth
       responses:
         "200": { $ref: "#/components/responses/Status" }
   /readyz:
     get:
+      summary: Check readiness for the in-memory bootstrap slice
       operationId: getReadiness
       responses:
         "200": { $ref: "#/components/responses/Status" }
   /v1/auth/sessions:
     post:
+      summary: Create an authenticated session (planned)
       operationId: createSession
       x-crownfall-implemented: false
       responses: { "501": { description: Not implemented } }
   /v1/lobbies:
     get:
+      summary: List available lobbies (planned)
       operationId: listLobbies
       x-crownfall-implemented: false
       responses: { "501": { description: Not implemented } }
   /v1/rooms:
     post:
+      summary: Create an in-memory bootstrap room
       operationId: createRoom
-      x-crownfall-implemented: false
-      responses: { "501": { description: Not implemented } }
+      x-crownfall-implemented: true
+      responses:
+        "201":
+          description: In-memory room created with a cryptographic seed commitment
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [roomId]
+                properties: { roomId: { type: string } }
   /v1/rooms/{roomId}/participants:
     post:
+      summary: Join a room over HTTP (planned; WebSocket join is implemented)
       operationId: joinRoom
       x-crownfall-implemented: false
       parameters:
@@ -40,6 +57,7 @@ paths:
       responses: { "501": { description: Not implemented } }
   /v1/matches/{matchId}/history:
     get:
+      summary: Read durable match history (planned)
       operationId: getMatchHistory
       x-crownfall-implemented: false
       parameters:
